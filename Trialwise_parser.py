@@ -26,7 +26,7 @@ RULE_TYPE_MAP = {
     "G1": "obj",
     "G2": "col",
     "L1": "obj",
-    "L2": "col",
+    "L2": "ori",
 }
 
 # Analyze the log files row by row, avoid dirty data
