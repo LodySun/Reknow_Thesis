@@ -99,7 +99,7 @@ if ~isempty(summaryRows)
     fprintf('Wrote %s\n', OUT_SUMMARY);
 end
 
-%% Helpers
+%% Helpers: standardize the data to make sure everything runs smoothly
 
 function s = local_event_type_to_string(ev)
     n = numel(ev);
