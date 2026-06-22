@@ -34,7 +34,7 @@ WIN_ALPHA_CUE_PREP = (0.40, 1.00)      # cue-locked preparatory alpha
 WIN_FP_BETA_MAIN = (0.30, 0.90)        # fronto-parietal maintenance/implementation
 
 ROI_FRONT = ["Fz", "FC1", "FC2", "Cz", "F3", "F4"]
-ROI_PARIETAL = ["Pz", "P3", "P4", "PO9", "PO10", "Oz"]
+ROI_PARIETAL = ["Pz", "P3", "P4"]
 ROI_ALPHA_POST = ["Pz", "P3", "P4", "Oz", "O1", "O2", "PO9", "PO10"]
 ROI_L = ["F3", "F7"]
 ROI_R = ["F4", "F8"]
