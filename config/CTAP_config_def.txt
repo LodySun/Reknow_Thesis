@@ -1,0 +1,34 @@
+Cfg
+	ctap
+		detect_bad_channels
+			[variable/varargin parameter names]
+		detect_bad_comps
+		detect_bad_epochs
+		epoch_data
+		extract_peripherals
+		filter_data
+		interp_chan
+		load_chanlocs
+		load_data
+		load_events
+		reject_data
+		reref_data
+		run_ica
+		save
+		select_data
+		tidy_chanlocs
+	env
+		[own environment vars]
+		paths
+			serverRoot
+			projectRoot
+			analysisRoot
+			featuresRoot
+			exportRoot
+		measurementInfo
+	eeg
+		chanlocs
+			File
+	measurement (defined in code)
+		(physio data)
+		(log file)
