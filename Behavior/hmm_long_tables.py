@@ -13,8 +13,8 @@ except ModuleNotFoundError:
     from codes.behav.trialwise_parser import build_trialwise_dataframe
     from codes.behav.trait_extractor import _search_inference_dynamics
 
-LOGS_DIR = "logs_dir"
-OUT_DIR = "out_dir"
+LOGS_DIR = "/Users/lodysun/Desktop/Thesis/logs"
+OUT_DIR = "/Users/lodysun/Desktop/Thesis/trials_trialwise"
 N_SUBJECTS = 34
 
 
@@ -75,7 +75,7 @@ def _build_block_long(trial_long: pd.DataFrame) -> pd.DataFrame:
         post_length = float(n_trials - first_correct_idx + 1) if pd.notna(first_correct_idx) else np.nan
 
         search_len_k = float((bdf["search_flag"] == 1).sum())
-        collapse_series = bdf[bdf["candidates_before"] == 1]
+        collapse_series = bdf[bdf["candidates_after"] == 1]
         collapse_onset_idx = (
             float(pd.to_numeric(collapse_series["trial_in_block"], errors="coerce").iloc[0])
             if not collapse_series.empty
@@ -102,7 +102,7 @@ def _build_block_long(trial_long: pd.DataFrame) -> pd.DataFrame:
         collapse_reversal_count = np.nan
         if pd.notna(collapse_onset_idx):
             after = bdf[pd.to_numeric(bdf["trial_in_block"], errors="coerce") >= collapse_onset_idx]
-            nb = pd.to_numeric(after["candidates_before"], errors="coerce")
+            nb = pd.to_numeric(after["candidates_after"], errors="coerce")
             collapse_reversal_count = float((nb.diff() > 0).sum()) if len(nb) >= 2 else 0.0
 
         conf_mask = bdf["eligible_confirmatory_trial"] == 1
@@ -195,7 +195,7 @@ def main():
         # keep requested names
         merged["candidates_before"] = pd.to_numeric(merged["n_possible_rules_before"], errors="coerce")
         merged["candidates_after"] = pd.to_numeric(merged["n_possible_rules_after"], errors="coerce")
-        merged["collapsed_flag"] = (merged["candidates_before"] == 1).astype(float)
+        merged["collapsed_flag"] = (merged["candidates_after"] == 1).astype(float)
         trial_rows.append(merged)
 
         subj_row, folds = run_subject_cv(base, subj)
