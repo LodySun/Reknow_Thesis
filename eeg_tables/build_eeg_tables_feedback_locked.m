@@ -15,8 +15,8 @@
 clear; clc;
 
 %% Paths
-BASE = 'base_dir';
-EEG_DIR = 'eeg_dir';
+BASE = '/Users/lodysun/Desktop/Thesis';
+EEG_DIR = '/Users/lodysun/Desktop/Thesis/prc/ctap/base_wcst/correct_wcst_5/tppd/4_ADJUST_IC_CORR';
 COMP_TAG = "1s_comp";
 ALIGN_MATCH_CSV = fullfile(BASE, 'trials_trialwise', COMP_TAG, 'eeg_behavior_trial_match_status.csv');
 TRIALWISE_DIR = fullfile(BASE, 'trials_trialwise', 'trialwise');
@@ -35,7 +35,7 @@ EPOCH_WIN_SEC = [-0.2, 0.8];
 BASELINE_MS = [-200, 0];
 
 % ERP windows (seconds) - primary windows only
-WIN_P3A = [0.25, 0.35];  % frontal / fronto-central
+WIN_P3A = [0.30, 0.45];  % frontal / fronto-central (Frontal P3: 300-450 ms)
 WIN_P3B = [0.30, 0.50];  % centro-parietal / parietal
 WIN_FRN = [0.20, 0.35];  % fronto-central FRN window (feedback-locked)
 
