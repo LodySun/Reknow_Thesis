@@ -13,11 +13,11 @@
 
 clear; clc;
 
-BASE = 'Your_BASE';
-EEG_DIR = 'Your_EEG_DIR';
+BASE = 'base_dir';
+EEG_DIR = 'eeg_dir';
 COMP_TAG = "1s_comp";
 
-SKIP_SUBS = ["reknow011", "reknow020", "reknow023"];  
+SKIP_SUBS = ["reknow011", "reknow020", "reknow023"];
 FEEDBACK_CODE = "60";
 
 outDir = fullfile(BASE, 'trials_trialwise', COMP_TAG);
@@ -99,7 +99,7 @@ if ~isempty(summaryRows)
     fprintf('Wrote %s\n', OUT_SUMMARY);
 end
 
-%% Helpers: standardize the data to make sure everything runs smoothly
+%% --- helpers ---
 
 function s = local_event_type_to_string(ev)
     n = numel(ev);
