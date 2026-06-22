@@ -276,12 +276,12 @@ def summarize(pairs: pd.DataFrame, idata: az.InferenceData) -> tuple[pd.DataFram
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--draws", type=int, default=1000)
-    parser.add_argument("--tune", type=int, default=1000)
+    parser.add_argument("--draws", type=int, default=1200)
+    parser.add_argument("--tune", type=int, default=1200)
     parser.add_argument("--chains", type=int, default=4)
     parser.add_argument("--cores", type=int, default=2)
     parser.add_argument("--min-subjects", type=int, default=4)
-    parser.add_argument("--target-accept", type=float, default=0.9)
+    parser.add_argument("--target-accept", type=float, default=0.95)
     args = parser.parse_args()
 
     os.makedirs(EXP, exist_ok=True)
