@@ -4,8 +4,8 @@ import pandas as pd
 import mne
 
 
-BASE = "base_dir"
-EEG_DIR = "eeg_dir"
+BASE = "/Users/lodysun/Desktop/Thesis"
+EEG_DIR = "/Users/lodysun/Desktop/Thesis/prc/ctap/base_wcst/correct_wcst_5/tppd/4_ADJUST_IC_CORR"
 ALIGN_MATCH_CSV = os.path.join(BASE, "trials_trialwise", "eeg_behavior_trial_match_status.csv")
 TRIALWISE_DIR = os.path.join(BASE, "trials_trialwise", "trialwise")
 BLOCK_LABEL_CSV = os.path.join(BASE, "trials_trialwise", "hmm_mixture", "hmm_mixture_soft_block_labels.csv")
@@ -18,7 +18,7 @@ TARGET_CODE = "30"
 EPOCH_WIN_SEC = (-0.2, 1.0)
 BASELINE = (-0.2, 0.0)
 
-WIN_P3A = (0.25, 0.35)  # frontal/fronto-central
+WIN_P3A = (0.30, 0.45)  # frontal/fronto-central (Frontal P3: 300-450 ms)
 WIN_P3B = (0.30, 0.50)  # centro-parietal/parietal
 BAND_THETA = (4, 7)
 BAND_ALPHA = (8, 12)
