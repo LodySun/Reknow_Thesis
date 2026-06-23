@@ -13,7 +13,7 @@ from scipy.stats import spearmanr, ttest_rel
 import mne
 
 
-BASE = "base_dir"
+BASE = "/Users/lodysun/Desktop/Thesis"
 COMP_TAG = "1s_comp"
 
 ALL_TRIAL = os.path.join(BASE, "trials_trialwise", "trialwise", "all_subjects_trialwise.csv")
@@ -81,6 +81,27 @@ def clear_figure_inference_log() -> None:
     FIGURE_INFERENCE_ROWS.clear()
 
 
+def _bh_fdr(pvals: np.ndarray) -> np.ndarray:
+    p = np.asarray(pvals, dtype=float)
+    out = np.full(len(p), np.nan, dtype=float)
+    ok = np.isfinite(p)
+    if ok.sum() == 0:
+        return out
+    idx = np.where(ok)[0]
+    pv = p[ok]
+    order = np.argsort(pv)
+    ranked = pv[order]
+    m = len(ranked)
+    adj = np.empty(m, dtype=float)
+    adj[-1] = ranked[-1]
+    for i in range(m - 2, -1, -1):
+        adj[i] = min(ranked[i] * m / (i + 1), adj[i + 1])
+    restored = np.empty(m, dtype=float)
+    restored[order] = np.clip(adj, 0.0, 1.0)
+    out[idx] = restored
+    return out
+
+
 def _append_inference_row(row: Dict[str, Any]) -> None:
     FIGURE_INFERENCE_ROWS.append(row)
 
@@ -110,9 +131,16 @@ def save_figure_inference_table(out_dir: str) -> str:
         "p_value",
         "mean_diff_a_minus_b",
         "note",
+        "p_fdr",
     ]
     if FIGURE_INFERENCE_ROWS:
-        pd.DataFrame(FIGURE_INFERENCE_ROWS).reindex(columns=cols).to_csv(path, index=False)
+        df = pd.DataFrame(FIGURE_INFERENCE_ROWS).reindex(columns=cols)
+        # BH FDR within S2 hypothesis families:
+        # figure1_behavior_rule_dimensions rows grouped by outcome (logRT family: 3 tests; accuracy family: 3 tests).
+        fig1 = df["figure_file"] == "figure1_behavior_rule_dimensions.png"
+        for _, grp_idx in df[fig1].groupby("outcome").groups.items():
+            df.loc[grp_idx, "p_fdr"] = _bh_fdr(df.loc[grp_idx, "p_value"].to_numpy(dtype=float))
+        df.to_csv(path, index=False)
     else:
         pd.DataFrame(columns=cols).to_csv(path, index=False)
     return path
