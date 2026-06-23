@@ -4,7 +4,28 @@ import pandas as pd
 from scipy.stats import ttest_rel
 
 
-BASE = "base_dir"
+BASE = "/Users/lodysun/Desktop/Thesis/trials_trialwise/1s_comp/eeg_paper_results/solidity"
+
+
+def _bh_fdr(pvals: np.ndarray) -> np.ndarray:
+    p = np.asarray(pvals, dtype=float)
+    out = np.full(len(p), np.nan, dtype=float)
+    ok = np.isfinite(p)
+    if ok.sum() == 0:
+        return out
+    idx = np.where(ok)[0]
+    pv = p[ok]
+    order = np.argsort(pv)
+    ranked = pv[order]
+    m = len(ranked)
+    adj = np.empty(m, dtype=float)
+    adj[-1] = ranked[-1]
+    for i in range(m - 2, -1, -1):
+        adj[i] = min(ranked[i] * m / (i + 1), adj[i + 1])
+    restored = np.empty(m, dtype=float)
+    restored[order] = np.clip(adj, 0.0, 1.0)
+    out[idx] = restored
+    return out
 HMM_BLOCK_CSV = os.path.join(BASE, "hmm_unified_block_metrics.csv")
 OUT_BLOCK = os.path.join(BASE, "hmm_based_search_metrics_block_level.csv")
 OUT_SUBJ = os.path.join(BASE, "hmm_based_search_metrics_subject_level.csv")
@@ -127,6 +148,7 @@ def main() -> None:
         )
     )
     test_df = pd.DataFrame(rows)
+    test_df["p_fdr"] = _bh_fdr(test_df["p"].to_numpy(dtype=float))
     test_df.to_csv(OUT_TEST, index=False)
 
     print(f"saved: {OUT_BLOCK}")
