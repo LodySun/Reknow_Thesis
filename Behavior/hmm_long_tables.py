@@ -13,8 +13,8 @@ except ModuleNotFoundError:
     from codes.behav.trialwise_parser import build_trialwise_dataframe
     from codes.behav.trait_extractor import _search_inference_dynamics
 
-LOGS_DIR = "/Users/lodysun/Desktop/Thesis/logs"
-OUT_DIR = "/Users/lodysun/Desktop/Thesis/trials_trialwise"
+LOGS_DIR = "logs_dir"
+OUT_DIR = "out_dir"
 N_SUBJECTS = 34
 
 
