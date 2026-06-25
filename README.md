@@ -37,7 +37,6 @@ behavioral acquisition trajectories also show similar EEG transition patterns.
 | `solidity/` | Core acquisition/transition analyses: unified block-level HMM dynamics, QC gate, ERP stage contrasts, FRN/P3b change analyses, global-precedence figures, and HMM diagnostics. |
 | `expand/` | Robustness and extension analyses: hierarchical Bayesian stage and two-step models, trial-count sensitivity, marker-validity checks, and IS-RSA (trajectory RDMs, sensitivity, plots). |
 | `config/` | Lightweight acquisition/preprocessing references: CTAP config and actiCAP 32-channel coordinates. |
-| `Demographic.py` | Participant demographic summary. |
 
 External toolboxes and environments (EEGLAB, CTAP, Python virtual environments)
 are **not** included; only project-specific scripts and lightweight config files
