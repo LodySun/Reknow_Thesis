@@ -8,13 +8,14 @@ import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 from scipy.stats import ttest_rel
 from figure_style_and_metrics import p_to_sig, set_helvetica_font, update_metrics_file
+from transition_stages import assign_transition_stage
 
 
-BASE_SOL = "base_sol_dir"
+BASE_SOL = "/Users/lodysun/Desktop/Thesis/trials_trialwise/1s_comp/eeg_paper_results/solidity"
 TRIAL_POST = os.path.join(BASE_SOL, "hmm_unified_trial_posteriors.csv")
-EEG_TRIAL = "eeg_trial_path"
-BEH_TRIAL = "beh_trial_path"
-HMM_LONG = "hmm_long_dir"
+EEG_TRIAL = "/Users/lodysun/Desktop/Thesis/trials_trialwise/1s_comp/eeg_tables/eeg_trial_long.csv"
+BEH_TRIAL = "/Users/lodysun/Desktop/Thesis/trials_trialwise/all_subjects_trialwise.csv"
+HMM_LONG = "/Users/lodysun/Desktop/Thesis/trials_trialwise/hmm_long_tables/hmm_trial_long.csv"
 set_helvetica_font()
 
 
@@ -74,18 +75,18 @@ def run_erp_changes():
     )
     m["set_bin"] = np.where(m["set_index"] <= 2, "early_1_2", np.where(m["set_index"] >= 7, "late_7_8", "middle"))
 
-    is_fc = m["trial_index_1based"] == m["first_correct_trial"]
-    is_transition_precore_corr = (m["trial_index_1based"] > m["first_correct_trial"]) & (m["trial_index_1based"] < m["acquisition_trial_core"]) & (m["correctness"] == 1)
-    is_sw = (m["trial_index_1based"] < m["first_correct_trial"]) & (m["correctness"] == 0)
-    is_sc = (m["trial_index_1based"] < m["first_correct_trial"]) & (m["correctness"] == 1)
-    is_acquired_corr = (m["trial_index_1based"] >= m["acquisition_trial_core"]) & (m["correctness"] == 1)
-
-    m["category"] = ""
-    m.loc[is_sw, "category"] = "search_error"
-    m.loc[is_sc, "category"] = "search_correct"
-    m.loc[is_fc, "category"] = "transition_first_correct"
-    m.loc[is_transition_precore_corr, "category"] = "transition_pre_core_correct"
-    m.loc[is_acquired_corr, "category"] = "acquired_correct"
+    # Trial-stage classification: single source of truth (transition_stages).
+    # Variant: index = trial_index_1based, acquired '>=' core, correctness filter,
+    # '_correct' names, WITH search_correct; acquired wins at fc==core.
+    m["category"] = assign_transition_stage(
+        m,
+        trial_col="trial_index_1based",
+        acquired_boundary=">=",
+        include_search_correct=True,
+        correct_suffix=True,
+        order=("search_error", "search_correct", "transition_first_correct",
+               "transition_pre_core", "acquired"),
+    )
     m = m[m["category"] != ""].copy()
 
     rows = []
