@@ -5,13 +5,15 @@ import numpy as np
 import pandas as pd
 from scipy.stats import norm, spearmanr, ttest_rel
 
+from transition_stages import stage_masks
+
 try:
     import statsmodels.formula.api as smf
 except Exception:
     smf = None
 
 
-BASE = "base_dir"
+BASE = "/Users/lodysun/Desktop/Thesis"
 EEG_TRIAL_CSV = os.path.join(BASE, "trials_trialwise", "1s_comp", "eeg_tables", "eeg_trial_long.csv")
 HMM_BLOCK_CSV = os.path.join(BASE, "trials_trialwise", "1s_comp", "eeg_paper_results", "solidity", "hmm_unified_block_metrics.csv")
 OUT_DIR = os.path.join(BASE, "trials_trialwise", "1s_comp", "eeg_paper_results", "solidity")
@@ -52,21 +54,22 @@ def _build_stage_rows(eeg: pd.DataFrame, block: pd.DataFrame) -> pd.DataFrame:
             continue
 
         b = bdf.copy()
-        b["trial_num"] = pd.to_numeric(b["trial_id"], errors="coerce")
         b["correctness"] = pd.to_numeric(b.get("correctness"), errors="coerce")
 
-        # Four local categories around the transition path:
-        # search -> transition (first-correct and pre-core) -> acquired.
-        search_error = b[(b["trial_num"] < fc) & (b["correctness"] == 0)]
-        transition_fc = b[b["trial_num"] == fc]
-        transition_pre_core = b[(b["trial_num"] > fc) & (b["trial_num"] < core)]
-        acquired_core = b[b["trial_num"] == core]
-
+        # Trial-stage classification: single source of truth (transition_stages).
+        # This file's historical variant: index = trial_id, acquired '==' core,
+        # NO correctness filter on pre_core/acquired, and OVERLAPPING views (a
+        # fc==core trial belongs to both transition_first_correct and acquired_core).
+        masks = stage_masks(
+            b, trial_col="trial_id", fc=fc, core=core,
+            acquired_boundary="==", pre_core_require_correct=False,
+            acquired_require_correct=False,
+        )
         cat_map = {
-            "search_error": search_error,
-            "transition_first_correct": transition_fc,
-            "transition_pre_core": transition_pre_core,
-            "acquired_core": acquired_core,
+            "search_error": b[masks["search_error"]],
+            "transition_first_correct": b[masks["transition_first_correct"]],
+            "transition_pre_core": b[masks["transition_pre_core"]],
+            "acquired_core": b[masks["acquired"]],
         }
 
         for feat in ERP_FEATURES:
