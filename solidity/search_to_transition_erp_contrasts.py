@@ -7,11 +7,12 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from scipy.stats import ttest_rel
 from figure_style_and_metrics import p_to_sig, set_helvetica_font, update_metrics_file
+from transition_stages import assign_transition_stage
 
 
-BASE = "base_dir"
+BASE = "/Users/lodysun/Desktop/Thesis/trials_trialwise/1s_comp/eeg_paper_results/solidity"
 TRIAL_POST_CSV = os.path.join(BASE, "hmm_unified_trial_posteriors.csv")
-EEG_TRIAL_CSV = "eeg_trial_csv_path"
+EEG_TRIAL_CSV = "/Users/lodysun/Desktop/Thesis/trials_trialwise/1s_comp/eeg_tables/eeg_trial_long.csv"
 OUT_DIR = BASE
 set_helvetica_font()
 
@@ -52,19 +53,15 @@ def _load_merged():
 
 def _categorize(m: pd.DataFrame) -> pd.DataFrame:
     d = m.copy()
-    d["category"] = pd.Series([""] * len(d), dtype="object")
-
-    is_fc = d["trial_index_1based"] == d["first_correct_trial"]
-    is_transition_pre_core_correct = (
-        (d["trial_index_1based"] > d["first_correct_trial"])
-        & (d["trial_index_1based"] < d["acquisition_trial_core"])
-        & (d["correctness"] == 1)
+    # Trial-stage classification: single source of truth (transition_stages).
+    # Variant: index = trial_index_1based, correctness filter; only the three
+    # CATEGORIES are kept (acquired / search_correct intentionally omitted via order).
+    d["category"] = assign_transition_stage(
+        d,
+        trial_col="trial_index_1based",
+        correct_suffix=True,
+        order=("search_error", "transition_pre_core", "transition_first_correct"),
     )
-    is_sw = (d["trial_index_1based"] < d["first_correct_trial"]) & (d["correctness"] == 0)
-
-    d.loc[is_sw, "category"] = "search_error"
-    d.loc[is_transition_pre_core_correct, "category"] = "transition_pre_core_correct"
-    d.loc[is_fc, "category"] = "transition_first_correct"
     d = d[d["category"].isin(CATEGORIES)].copy()
     return d
 
