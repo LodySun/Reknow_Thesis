@@ -1,7 +1,12 @@
 import os
+import sys
 
 import numpy as np
 import pandas as pd
+
+# Trial-stage classification lives in the sibling solidity/ package (single source of truth).
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "solidity"))
+from transition_stages import assign_transition_stage  # noqa: E402
 
 
 BASE = "/Users/lodysun/Desktop/Thesis"
@@ -125,19 +130,17 @@ def _build_p300_stage_cells() -> pd.DataFrame:
         on=["subj", "block_id", "trial_id"],
         how="inner",
     )
-    m["category"] = ""
-    is_fc = m["trial_index_1based"] == m["first_correct_trial"]
-    is_transition_precore_corr = (
-        (m["trial_index_1based"] > m["first_correct_trial"])
-        & (m["trial_index_1based"] < m["acquisition_trial_core"])
-        & (m["correctness"] == 1)
+    # Trial-stage classification: single source of truth (transition_stages).
+    # Variant: index = trial_index_1based, acquired '>=' core, correctness filter,
+    # '_correct' names, no search_correct; acquired wins at fc==core.
+    m["category"] = assign_transition_stage(
+        m,
+        trial_col="trial_index_1based",
+        acquired_boundary=">=",
+        include_search_correct=False,
+        correct_suffix=True,
+        order=("search_error", "transition_first_correct", "transition_pre_core", "acquired"),
     )
-    is_search_error = (m["trial_index_1based"] < m["first_correct_trial"]) & (m["correctness"] == 0)
-    is_acquired_corr = (m["trial_index_1based"] >= m["acquisition_trial_core"]) & (m["correctness"] == 1)
-    m.loc[is_search_error, "category"] = "search_error"
-    m.loc[is_fc, "category"] = "transition_first_correct"
-    m.loc[is_transition_precore_corr, "category"] = "transition_pre_core_correct"
-    m.loc[is_acquired_corr, "category"] = "acquired_correct"
     m = m[m["category"] != ""].copy()
 
     rows = []
